@@ -1,7 +1,6 @@
-class SleepJob
-  include Job
-
-  def initialize(time=1)
+class SleepJob < Job
+  def initialize(env, time=1)
+    super(env)
     @time = time
     @type = :sleep
   end
