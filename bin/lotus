@@ -26,6 +26,11 @@ class Lotus < Thor
   def create_db
     CreateDB.new().execute!
   end
+
+  desc 'update_schema', 'update schema'
+  def update_schema
+    UpdateSchema.new().execute!
+  end
 end
 
 Lotus.start(ARGV)
