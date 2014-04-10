@@ -4,11 +4,20 @@ require 'bundler'
 Bundler.require
 require 'active_support/core_ext'
 
+root = File.expand_path(__dir__ + '/..')
+%w{job}.each do |filename|
+  require root+'/lib/'+filename
+end
+
+%w{sleep}.each do |filename|
+  require root+'/jobs/'+filename
+end
+
 
 class Lotus < Thor
   desc 'sleep', 'test job'
   def sleep
-    p :sleep
+    SleepJob.new().execute!
   end
 end
 
