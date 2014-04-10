@@ -3,6 +3,8 @@
 require 'bundler'
 Bundler.require
 require 'active_support/core_ext'
+require 'active_record'
+require 'yaml'
 
 root = File.expand_path(__dir__ + '/..')
 %w{job}.each do |filename|
@@ -12,6 +14,11 @@ end
 %w{sleep}.each do |filename|
   require root+'/jobs/'+filename
 end
+
+database_config = YAML.load_file(root+'/config/database.yml').symbolize_keys
+ActiveRecord::Base.establish_connection(
+  database_config[:development]
+)
 
 
 class Lotus < Thor
