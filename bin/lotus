@@ -12,6 +12,10 @@ root = File.expand_path(__dir__ + '/..')
   require root+'/lib/'+filename
 end
 
+%w{video job job_log}.each do |filename|
+  require root+'/models/'+filename
+end
+
 %w{sleep create_db}.each do |filename|
   require root+'/jobs/'+filename
 end
@@ -20,6 +24,14 @@ class Lotus < Thor
   desc 'sleep', 'test job'
   def sleep
     SleepJob.new().execute!
+  end
+
+  desc 'process', 'process'
+  def process
+  end
+
+  desc 'process_all', 'process all'
+  def process_all
   end
 
   desc 'create_db', 'create_db'

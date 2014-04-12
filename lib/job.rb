@@ -1,4 +1,4 @@
-class Job
+class JobTemplate
   def initialize(env=:development)
     @env = env
     establish_db_connection()

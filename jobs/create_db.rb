@@ -1,4 +1,4 @@
-class UpdateSchema < Job
+class UpdateSchema < JobTemplate
   def initialize(env=:development)
     super(env)
     @type = :update_schema

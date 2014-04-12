@@ -1,4 +1,4 @@
-class SleepJob < Job
+class SleepJob < JobTemplate
   def initialize(env, time=1)
     super(env)
     @time = time

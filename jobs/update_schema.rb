@@ -1,4 +1,4 @@
-class CreateDB < Job
+class CreateDB < JobTemplate
   def initialize(env=:development)
     super
     @type = :create_db
