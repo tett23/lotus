@@ -16,7 +16,7 @@ end
   require root+'/models/'+filename
 end
 
-%w{sleep create_db}.each do |filename|
+%w{sleep create_db update_schema process}.each do |filename|
   require root+'/jobs/'+filename
 end
 
@@ -28,6 +28,7 @@ class Lotus < Thor
 
   desc 'process', 'process'
   def process
+    ProcessJob.new().execute!
   end
 
   desc 'process_all', 'process all'
