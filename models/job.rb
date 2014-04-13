@@ -1,5 +1,5 @@
 class Job < ActiveRecord::Base
-  enum type: [:encode, :repair]
+  enum type: [:encode, :repair, :restructure_queue, :update_schema]
   belongs_to :video
 
   def self.first
