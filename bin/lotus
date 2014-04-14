@@ -8,15 +8,15 @@ require 'active_record'
 require 'yaml'
 
 root = File.expand_path(__dir__ + '/..')
-%w{lotus lotus/job}.each do |filename|
+%w{lotus lotus/job lotus/ts lotus/epg_parser}.each do |filename|
   require root+'/lib/'+filename
 end
 
-%w{video job job_log}.each do |filename|
+%w{video job job_log filter_regexp}.each do |filename|
   require root+'/models/'+filename
 end
 
-%w{sleep create_db update_schema process}.each do |filename|
+%w{sleep create_db update_schema process load_ts}.each do |filename|
   require root+'/jobs/'+filename
 end
 
@@ -45,6 +45,11 @@ class LotusCLI < Thor
   desc 'update_schema', 'update schema'
   def update_schema
     UpdateSchema.new(env).execute!
+  end
+
+  desc 'load_ts', 'load ts'
+  def load_ts
+    LoadTSJob.new(env).execute!
   end
 
   private
