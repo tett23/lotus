@@ -1,4 +1,4 @@
-class UpdateSchema < JobTemplate
+class UpdateSchema < Lotus::Job
   def initialize(env=:development)
     super(env)
     @type = :update_schema

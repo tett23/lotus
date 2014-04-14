@@ -1,4 +1,4 @@
-class ProcessJob < JobTemplate
+class ProcessJob < Lotus::Job
   def initialize(env=:development)
     super(env)
     @type = :process

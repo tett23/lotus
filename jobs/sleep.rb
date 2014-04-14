@@ -1,4 +1,4 @@
-class SleepJob < JobTemplate
+class SleepJob < Lotus::Job
   def initialize(env, time=1)
     super(env)
     @time = time

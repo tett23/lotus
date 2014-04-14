@@ -1,4 +1,4 @@
-class CreateDB < JobTemplate
+class CreateDB < Lotus::Job
   def initialize(env=:development)
     super
     @type = :create_db
