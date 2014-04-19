@@ -7,12 +7,12 @@ module Lotus
       @width = width
       @height = height
       @save_path = File.join(Lotus.config[:save_dir], @video.output_name)
-      @input_path = File.join(Lotus.config[:ts_dir], @ts.original_name)
+      @input_path = video.repaired_ts.blank? ? File.join(Lotus.config[:ts_dir], @ts.original_name) : video.repaired_ts
       @log_path = File.join('log', @ts.identification_code.to_s+'.log')
     end
 
     def execute!
-      command = "sh ts2mp4.sh '#{@input_path}' '#{@output_path}' #{@width} #{@height} 2>#{@log_path}"
+      command = "sh ts2mp4.sh #{Shellwords.shellescape(@input_path)} #{Shellwords.shellescape(@output_path)} #{@width} #{@height} 2>#{@log_path}"
 
       unless File.exists?(@input_path)
         return {
@@ -30,6 +30,7 @@ module Lotus
         }
       end
 
+      output_size = filesize()
       unless FileUtils.mv(@output_path, @save_path)
         return {
           result: false,
@@ -40,6 +41,11 @@ module Lotus
       unless @video.repaired_ts.blank?
         FileUtils.rm(@video.repaired_ts)
       end
+
+      @video.is_encoded = true
+      @video.saved_directory = Lotus.config[:save_dir]
+      @video.filesize = output_size
+      @video.save()
 
       {
         result: true,

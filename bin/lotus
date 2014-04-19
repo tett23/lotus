@@ -6,6 +6,7 @@ require 'active_support'
 require 'active_support/core_ext'
 require 'active_record'
 require 'yaml'
+require 'shellwords'
 
 root = File.expand_path(__dir__ + '/..')
 %w{lotus lotus/job lotus/ts lotus/epg_parser lotus/repair lotus/encode}.each do |filename|

@@ -7,8 +7,7 @@ HEIGHT=$4
 BASE=$(basename $TS .ts)
 [ "${BASE}.ts" = "$(basename $TS)" ] || exit 1
 
-#CPU_CORES=$(/usr/bin/getconf _NPROCESSORS_ONLN)
-CPU_CORES=1
+CPU_CORES=$(/usr/bin/getconf _NPROCESSORS_ONLN)
 
 X264_HIGH_HDTV="-f mp4 \
   -vcodec libx264 \
