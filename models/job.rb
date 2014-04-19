@@ -47,7 +47,7 @@ class Job < ActiveRecord::Base
 
   def self.add_repair(arguments)
     arguments = {
-      length: 1.5
+      length: '00:00:01.500'
     }.merge(arguments)
     raise 'video_id is must not be blank' if arguments[:video_id].blank?
 
@@ -96,7 +96,10 @@ class Job < ActiveRecord::Base
 
     case self.job_type.to_sym
     when :repair
-      Lotus::Repair.new(ts, video, encode_size[:width], encode_size[:height]).execute!
+      runner = Lotus::Repair.new(ts, video, arguments[:length])
+      result = runner.execute!
+      status = result ? :success : :failure
+      log.finish(status, runner.log)
     when :encode
       encode_size = arguments[:encode_size].symbolize_keys
       encode_log = Lotus::Encode.new(ts, video, encode_size[:width], encode_size[:height]).execute!
