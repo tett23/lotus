@@ -5,6 +5,7 @@ class JobLog < ActiveRecord::Base
   def self.push(job)
     self.create(
       body: '',
+      arguments: job.arguments,
       start_at: DateTime.now,
       status: :in_progress,
       job_id: job.id,
