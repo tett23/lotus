@@ -26,7 +26,7 @@ class LoadTSJob < Lotus::Job
 
       next if video.is_encoded
 
-      Job.add_repair(video_id: video.id) unless Job.exists_repair?(video.id)
+      Job.add_repair(video_id: video.id) if !Job.exists_repair?(video.id) && video.has_sd?
       Job.add_encode(video_id: video.id) unless Job.exists_encode?(video.id)
     end
   end
