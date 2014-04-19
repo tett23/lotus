@@ -29,8 +29,9 @@ class LotusCLI < Thor
   end
 
   desc 'process', 'process'
-  def process
-    ProcessJob.new(env).execute!
+  option :job_id, required: false, type: :numeric
+  def process(job_id=nil)
+    ProcessJob.new(env, job_id).execute!
   end
 
   desc 'process_all', 'process all'
