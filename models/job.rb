@@ -102,9 +102,10 @@ class Job < ActiveRecord::Base
       log.finish(status, runner.log)
     when :encode
       encode_size = arguments[:encode_size].symbolize_keys
-      encode_log = Lotus::Encode.new(ts, video, encode_size[:width], encode_size[:height]).execute!
-      status = encode_log[:result] ? :success : :failure
-      log.finish(status, encode_log[:body])
+      runner = Lotus::Encode.new(ts, video, encode_size[:width], encode_size[:height])
+      result = runner.execute!
+      status = result ? :success : :failure
+      log.finish(status, runner.log)
     else
       log.finish(:failure, 'invalid job type')
     end

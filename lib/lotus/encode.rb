@@ -9,33 +9,29 @@ module Lotus
       @save_path = File.join(Lotus.config[:save_dir], @video.output_name)
       @input_path = video.repaired_ts.blank? ? File.join(Lotus.config[:ts_dir], @ts.original_name) : video.repaired_ts
       @log_path = File.join('log', @ts.identification_code.to_s+'.log')
+      @log = ''
     end
+    attr_reader :log
 
     def execute!
       command = "sh ts2mp4.sh #{Shellwords.shellescape(@input_path)} #{Shellwords.shellescape(@output_path)} #{@width} #{@height} 2>#{@log_path}"
 
       unless File.exists?(@input_path)
-        return {
-          result: false,
-          body: "#{command}\ntsが存在しない"
-        }
+        @log = "#{command}\ntsが存在しない"
+        return false
       end
 
       system(command)
 
       unless File.exists?(@output_path)
-        return {
-          result: false,
-          body: "#{command}\nファイルが生成されていない？"
-        }
+        @log = "#{command}\nファイルが生成されていない？"
+        return false
       end
 
       output_size = filesize()
       unless FileUtils.mv(@output_path, @save_path)
-        return {
-          result: false,
-          body: "#{command}\nファイルの移動に失敗。NASが起動していない？"
-        }
+        @log = "#{command}\nファイルの移動に失敗。NASが起動していない？"
+        return false
       end
 
       unless @video.repaired_ts.blank?
@@ -47,16 +43,9 @@ module Lotus
       @video.filesize = output_size
       @video.save()
 
-      {
-        result: true,
-        body: log,
-      }
-    end
+      @log = open(@log_path, 'rb').read.encode!('utf-8', undef: :replace, invalid: :replace, replace: '').gsub(/(\r\n|\r)/, "\n")
 
-    def log
-      return '' unless File.exists?(@log_path)
-
-      open(@log_path, 'rb').read.encode!('utf-8', undef: :replace, invalid: :replace, replace: '').gsub(/(\r\n|\r)/, "\n")
+      return true
     end
 
     def filesize
