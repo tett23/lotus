@@ -17,6 +17,7 @@ GEM
     arel (5.0.0)
     builder (3.2.2)
     chronic (0.10.2)
+    eventmachine (1.0.3)
     i18n (0.6.9)
     json (1.8.1)
     minitest (5.3.2)
@@ -36,6 +37,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord
   activesupport
+  eventmachine
   moji
   mysql2
   thor

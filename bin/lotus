@@ -8,7 +8,7 @@ require 'active_record'
 require 'yaml'
 
 root = File.expand_path(__dir__ + '/..')
-%w{lotus lotus/job lotus/ts lotus/epg_parser}.each do |filename|
+%w{lotus lotus/job lotus/ts lotus/epg_parser lotus/repair lotus/encode}.each do |filename|
   require root+'/lib/'+filename
 end
 

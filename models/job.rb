@@ -1,6 +1,12 @@
 class Job < ActiveRecord::Base
   enum job_type: [:encode, :repair, :restructure_queue, :update_schema]
 
+  ENCODE_SIZE = [
+    {width: 1440, height: 1080},
+    {width: 1280, height: 720},
+    {width: 480, height: 360}
+  ]
+
   def self.first
     self.all().order(priority: :desc, id: :desc).first
   end
@@ -38,12 +44,6 @@ class Job < ActiveRecord::Base
       job.parsed_arguments[:video_id] === video_id
     end.nil?
   end
-
-  ENCODE_SIZE = [
-    {width: 1440, height: 1080},
-    {width: 1280, height: 720},
-    {width: 480, height: 360}
-  ]
 
   def self.add_repair(arguments)
     arguments = {
@@ -84,5 +84,28 @@ class Job < ActiveRecord::Base
     return {} unless parsed
 
     parsed.symbolize_keys
+  end
+
+  def execute!
+    #return if self.in_running
+    log = JobLog << self
+    Job.update(self.id, in_running: true)
+    ts = Lotus::TS.new(self.video.original_name)
+    video = self.video
+    arguments = self.parsed_arguments
+
+    case self.job_type.to_sym
+    when :repair
+      Lotus::Repair.new(ts, video, encode_size[:width], encode_size[:height]).execute!
+    when :encode
+      encode_size = arguments[:encode_size].symbolize_keys
+      encode_log = Lotus::Encode.new(ts, video, encode_size[:width], encode_size[:height]).execute!
+      status = encode_log[:result] ? :success : :failure
+      log.finish(status, encode_log[:body])
+    else
+      log.finish(:failure, 'invalid job type')
+    end
+
+    #self.destroy
   end
 end
