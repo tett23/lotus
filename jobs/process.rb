@@ -15,6 +15,7 @@ class ProcessJob < Lotus::Job
     when :restructure_queue
       LoadTSJob.new(@env).execute!
     when :update_schema
+      UpdateSchema.new(@env).execute!
     else
       puts 'undefined job type'
     end
