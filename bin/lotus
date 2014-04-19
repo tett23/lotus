@@ -16,7 +16,7 @@ end
   require root+'/models/'+filename
 end
 
-%w{sleep create_db update_schema process load_ts}.each do |filename|
+%w{sleep create_db update_schema process load_ts clear_queue}.each do |filename|
   require root+'/jobs/'+filename
 end
 
@@ -50,6 +50,11 @@ class LotusCLI < Thor
   desc 'load_ts', 'load ts'
   def load_ts
     LoadTSJob.new(env).execute!
+  end
+
+  desc 'clear_queue', 'clear queue'
+  def clear_queue
+    ClearQueueJob.new(env).execute!
   end
 
   private
