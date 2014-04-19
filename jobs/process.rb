@@ -6,20 +6,24 @@ class ProcessJob < Lotus::Job
   end
 
   def execute!
-    job = load_job()
-    return if job.blank?
+    EM.run do
+      job = load_job()
+      return if job.blank?
 
-    case job.job_type.to_sym
-    when :encode
-      job.execute!
-    when :repair
-      job.execute!
-    when :restructure_queue
-      LoadTSJob.new(@env).execute!
-    when :update_schema
-      UpdateSchema.new(@env).execute!
-    else
-      puts 'undefined job type'
+      case job.job_type.to_sym
+      when :encode
+        job.execute!
+      when :repair
+        job.execute!
+      when :restructure_queue
+        LoadTSJob.new(@env).execute!
+      when :update_schema
+        UpdateSchema.new(@env).execute!
+      else
+        puts 'undefined job type'
+      end
+
+      EM.stop
     end
   end
 
