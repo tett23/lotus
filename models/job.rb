@@ -90,8 +90,8 @@ class Job < ActiveRecord::Base
     return if self.in_running
     log = JobLog << self
     Job.update(self.id, in_running: true)
-    ts = Lotus::TS.new(self.video.original_name)
     video = self.video
+    ts = Lotus::TS.new(video.original_name)
     arguments = self.parsed_arguments
 
     case self.job_type.to_sym
@@ -103,6 +103,11 @@ class Job < ActiveRecord::Base
     when :encode
       encode_size = arguments[:encode_size].symbolize_keys
       runner = Lotus::Encode.new(ts, video, encode_size[:width], encode_size[:height])
+      result = runner.execute!
+      status = result ? :success : :failure
+      log.finish(status, runner.log)
+    when :destroy_ts
+      runner = Lotus::DestroyTS.new(ts)
       result = runner.execute!
       status = result ? :success : :failure
       log.finish(status, runner.log)
