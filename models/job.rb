@@ -1,5 +1,5 @@
 class Job < ActiveRecord::Base
-  enum job_type: [:encode, :repair, :restructure_queue, :update_schema]
+  enum job_type: [:encode, :repair, :restructure_queue, :update_schema, :destroy_ts]
 
   ENCODE_SIZE = [
     {width: 1440, height: 1080},
@@ -89,32 +89,45 @@ class Job < ActiveRecord::Base
   def execute!
     return if self.in_running
     log = JobLog << self
-    Job.update(self.id, in_running: true)
-    video = self.video
-    ts = Lotus::TS.new(video.original_name)
-    arguments = self.parsed_arguments
+    log_body = ''
+    status = :failure
 
-    case self.job_type.to_sym
-    when :repair
-      runner = Lotus::Repair.new(ts, video, arguments[:length])
-      result = runner.execute!
-      status = result ? :success : :failure
-      log.finish(status, runner.log)
-    when :encode
-      encode_size = arguments[:encode_size].symbolize_keys
-      runner = Lotus::Encode.new(ts, video, encode_size[:width], encode_size[:height])
-      result = runner.execute!
-      status = result ? :success : :failure
-      log.finish(status, runner.log)
-    when :destroy_ts
-      runner = Lotus::DestroyTS.new(ts)
-      result = runner.execute!
-      status = result ? :success : :failure
-      log.finish(status, runner.log)
-    else
-      log.finish(:failure, 'invalid job type')
+    begin
+      Job.update(self.id, in_running: true)
+      video = self.video
+      ts = Lotus::TS.new(video.original_name)
+      arguments = self.parsed_arguments
+
+      case self.job_type.to_sym
+      when :repair
+        runner = Lotus::Repair.new(ts, video, arguments[:length])
+        result = runner.execute!
+        status = result ? :success : :failure
+        log_body = runner.log
+      when :encode
+        encode_size = arguments[:encode_size].symbolize_keys
+        runner = Lotus::Encode.new(ts, video, encode_size[:width], encode_size[:height])
+        result = runner.execute!
+        status = result ? :success : :failure
+        log_body = runner.log
+      when :destroy_ts
+        runner = Lotus::DestroyTS.new(ts)
+        result = runner.execute!
+        status = result ? :success : :failure
+        log_body = runner.log
+      else
+        status = :failure
+        log_body = 'invalid job type'
+      end
+    rescue => e
+      status = :failure
+      log_body = "#{e.message}\n#{e.to_s}\n#{e.backtrace.join("\n")}"
+    rescue Interrupt
+      status = :failure
+      log_body = "Interrupt\n#{$!.to_s}\n#{$!.message}\n#{$!.backtrace.join("\n")}"
+    ensure
+      log.finish(status, log_body)
+      self.destroy
     end
-
-    self.destroy
   end
 end
