@@ -87,7 +87,7 @@ class Job < ActiveRecord::Base
   end
 
   def execute!
-    #return if self.in_running
+    return if self.in_running
     log = JobLog << self
     Job.update(self.id, in_running: true)
     ts = Lotus::TS.new(self.video.original_name)
@@ -110,6 +110,6 @@ class Job < ActiveRecord::Base
       log.finish(:failure, 'invalid job type')
     end
 
-    #self.destroy
+    self.destroy
   end
 end
