@@ -119,14 +119,14 @@ class Job < ActiveRecord::Base
         status = :failure
         log_body = 'invalid job type'
       end
-    rescue => e
-      status = :failure
-      log_body = "#{e.message}\n#{e.to_s}\n#{e.backtrace.join("\n")}"
     rescue Interrupt
       status = :failure
       log_body = "Interrupt\n#{$!.to_s}\n#{$!.message}\n#{$!.backtrace.join("\n")}"
+    rescue Exception => e
+      status = :failure
+      log_body = "#{e.message}\n#{e.to_s}\n#{e.backtrace.join("\n")}"
     ensure
-      log.finish(status, log_body)
+      log.finish(status, log_body[0..10000])
       self.destroy
     end
   end
