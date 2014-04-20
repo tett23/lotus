@@ -15,6 +15,8 @@ class ProcessJob < Lotus::Job
         job.execute!
       when :repair
         job.execute!
+      when :destroy_ts
+        job.execute!
       when :restructure_queue
         LoadTSJob.new(@env).execute!
       when :update_schema
@@ -29,12 +31,10 @@ class ProcessJob < Lotus::Job
 
   private
   def load_job
-    return nil if Job.running?
-
     if @job_id.blank?
       Job.list.first
     else
-      Job.find(@job_id)
+      Job.find_by_id(@job_id)
     end
   end
 end

@@ -9,11 +9,11 @@ class Video < ActiveRecord::Base
     exists_sd
   end
 
-  private
   def ts_path
     "#{Lotus.config[:ts_dir]}/#{self.original_name}"
   end
 
+  private
   def out_video_info_path
     "tmp/video_info_#{self.identification_code}"
   end

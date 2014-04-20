@@ -91,7 +91,9 @@ class Job < ActiveRecord::Base
   end
 
   def execute!
-    return if self.in_running
+    action = self.job_type.to_sym
+    return if allow_multi_process?(action) && self.in_running
+
     log = JobLog << self
     log_body = ''
     status = :failure
@@ -102,7 +104,7 @@ class Job < ActiveRecord::Base
       ts = Lotus::TS.new(video.original_name)
       arguments = self.parsed_arguments
 
-      case self.job_type.to_sym
+      case action
       when :repair
         runner = Lotus::Repair.new(ts, video, arguments[:length])
         result = runner.execute!
@@ -115,7 +117,7 @@ class Job < ActiveRecord::Base
         status = result ? :success : :failure
         log_body = runner.log
       when :destroy_ts
-        runner = Lotus::DestroyTS.new(ts)
+        runner = Lotus::DestroyTS.new(video)
         result = runner.execute!
         status = result ? :success : :failure
         log_body = runner.log
@@ -133,5 +135,9 @@ class Job < ActiveRecord::Base
       log.finish(status, log_body[0..10000])
       self.destroy
     end
+  end
+
+  def allow_multi_process?(action)
+    [:repair, :encode].include?(action)
   end
 end
