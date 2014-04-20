@@ -21,6 +21,8 @@ end
   require root+'/jobs/'+filename
 end
 
+ActiveRecord::Base.default_timezone = :local
+
 class LotusCLI < Thor
   class_option :env
 
