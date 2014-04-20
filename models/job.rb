@@ -86,6 +86,10 @@ class Job < ActiveRecord::Base
     parsed.symbolize_keys
   end
 
+  def self.running?
+    !self.find_by_in_running(true).blank?
+  end
+
   def execute!
     return if self.in_running
     log = JobLog << self

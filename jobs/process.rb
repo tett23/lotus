@@ -29,6 +29,8 @@ class ProcessJob < Lotus::Job
 
   private
   def load_job
+    return nil if Job.running?
+
     if @job_id.blank?
       Job.list.first
     else
