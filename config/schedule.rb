@@ -25,3 +25,7 @@ job_type :lotus, "cd :path > /dev/null && source /home/tett23/.rvm/environments/
 every 1.minute do
   lotus "process"
 end
+
+every 1.day, at: '6am' do
+  lotus "load_ts"
+end
