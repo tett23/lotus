@@ -126,7 +126,7 @@ module Lotus
     end
 
     def parse_name
-      @original_name.split(/\[(.)\]/).delete_if do |s|
+      @original_name.split(/\[(.{1,2})\]/).delete_if do |s|
         s.blank?
       end
     end
