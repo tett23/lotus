@@ -13,11 +13,12 @@ module Lotus
       raise '' unless response.status == 200
 
       JSON.parse(response.body)['items'].each do |item|
+        episode_name = item['SubTitle'].nil? ? nil : item['SubTitle'].first(255)
         program = Program.where({
           start_at: Time.at(item['StTime'].to_i),
           end_at: Time.at(item['EdTime'].to_i),
           title: item['Title'],
-          episode_name: item['SubTitle'],
+          episode_name: episode_name,
           count: item['Count'].to_i,
           channel_name: item['ChName'],
           channel_id: item['ChID'].to_i,
@@ -34,8 +35,8 @@ module Lotus
     private
     def query(start_on: nil, end_on: nil)
       {
-        start: (start_on || Time.now.beginning_of_day).strftime('%Y%m%d%H%M'),
-        end_on: (end_on || Time.now.beginning_of_day+1.day).strftime('%Y%m%d%H%M'),
+        start: (start_on || Time.now.beginning_of_day-2.day).strftime('%Y%m%d%H%M'),
+        end: (end_on || Time.now.beginning_of_day+5.day).strftime('%Y%m%d%H%M'),
         count: 1000,
         titlefmt: '$(Title),$(Count),$(SubTitleA),$(PID),$(ChName)',
         alt: 'json'
