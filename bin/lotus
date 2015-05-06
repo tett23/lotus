@@ -17,7 +17,7 @@ end
   require root+'/models/'+filename
 end
 
-%w{sleep create_db update_schema process load_ts clear_queue get_program}.each do |filename|
+%w{sleep create_db update_schema process load_ts clear_queue get_program update_output_name}.each do |filename|
   require root+'/jobs/'+filename
 end
 
@@ -64,6 +64,12 @@ class LotusCLI < Thor
   desc 'get_program', 'get program'
   def get_program
     GetProgramJob.new(env).execute!
+  end
+
+  desc 'update_output_name', 'update_output_name'
+  option :video_id, type: :numeric
+  def update_output_name(video_id)
+    UpdateOutputNameJob.new(env, video_id).execute!
   end
 
   private

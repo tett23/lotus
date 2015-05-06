@@ -13,6 +13,30 @@ class Video < ActiveRecord::Base
     "#{Lotus.config[:ts_dir]}/#{self.original_name}"
   end
 
+  def broadcast_start_at
+    DateTime.parse("#{self.program.lines.first.gsub(/^(.+)～.+/, '\1').strip} JST")
+  end
+
+  def broadcast_end_at
+    DateTime.parse("#{self.program.lines.first.gsub(/^(.+) .+～(.+)$/, '\1 \2').strip} JST")
+  end
+
+  def channel_name
+    self.program.lines[1].strip
+  end
+
+  def build_output_name
+    "#{self.name}#{self.episode_number ? '#'+self.episode_number.to_s : ''}#{self.episode_name ? "「#{self.episode_name}」" : ''}_#{self.event_id}.mp4"
+  end
+
+  def move_output_file(destination)
+    return if !self.is_encoded && self.saved_directory.blank?
+
+    FileUtils.mv(File.join(self.saved_directory, self.output_name), File.join(self.saved_directory, destination))
+    self.output_name = destination
+    self.save()
+  end
+
   private
   def out_video_info_path
     "tmp/video_info_#{self.identification_code}"
