@@ -23,6 +23,11 @@ class ProcessJob < Lotus::Job
       when :update_schema
         UpdateSchema.new(@env).execute!
         job.destroy
+      when :update_output_name
+        job.execute!
+      when :get_program
+        GetProgramJob.new(@env).execute!
+        job.destroy
       else
         puts 'undefined job type'
       end

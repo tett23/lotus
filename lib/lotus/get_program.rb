@@ -36,7 +36,7 @@ module Lotus
     def query(start_on: nil, end_on: nil)
       {
         start: (start_on || Time.now.beginning_of_day-2.day).strftime('%Y%m%d%H%M'),
-        end: (end_on || Time.now.beginning_of_day+5.day).strftime('%Y%m%d%H%M'),
+        end: (end_on || Time.now.beginning_of_day+6.day).strftime('%Y%m%d%H%M'),
         count: 1000,
         titlefmt: '$(Title),$(Count),$(SubTitleA),$(PID),$(ChName)',
         alt: 'json'

@@ -30,9 +30,14 @@ class Video < ActiveRecord::Base
   end
 
   def move_output_file(destination)
-    return if !self.is_encoded && self.saved_directory.blank?
+    if self.is_encoded and not self.saved_directory.blank?
+      source_path = File.join(self.saved_directory, self.output_name)
+      destination_path = File.join(self.saved_directory, destination)
+      unless source_path == destination_path
+        FileUtils.mv(source_path, destination_path)
+      end
+    end
 
-    FileUtils.mv(File.join(self.saved_directory, self.output_name), File.join(self.saved_directory, destination))
     self.output_name = destination
     self.save()
   end

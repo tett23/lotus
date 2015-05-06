@@ -1,6 +1,6 @@
 class JobLog < ActiveRecord::Base
   enum status: [:failure, :success, :in_progress]
-  enum job_type: [:encode, :repair, :restructure_queue, :update_schema, :destroy_ts]
+  enum job_type: [:encode, :repair, :restructure_queue, :update_schema, :destroy_ts, :update_output_name, :get_program]
 
   def self.push(job)
     self.create(

@@ -1,5 +1,5 @@
 class Job < ActiveRecord::Base
-  enum job_type: [:encode, :repair, :restructure_queue, :update_schema, :destroy_ts]
+  enum job_type: [:encode, :repair, :restructure_queue, :update_schema, :destroy_ts, :update_output_name, :get_program]
 
   ENCODE_SIZE = [
     {width: 1440, height: 1080},
@@ -26,11 +26,15 @@ class Job < ActiveRecord::Base
   end
 
   def self.repair_jobs
-    self.where(job_type: :repair)
+    self.repair
   end
 
   def self.encode_jobs
-    self.where(job_type: :repair)
+    self.encode
+  end
+
+  def self.update_output_name_jobs
+    self.update_output_name
   end
 
   def self.exists_repair?(video_id)
@@ -41,6 +45,12 @@ class Job < ActiveRecord::Base
 
   def self.exists_encode?(video_id)
     not Job.encode_jobs.find do |job|
+      job.parsed_arguments[:video_id] === video_id
+    end.nil?
+  end
+
+  def self.exists_update_output_name?(video_id)
+    not Job.update_output_name_jobs.find do |job|
       job.parsed_arguments[:video_id] === video_id
     end.nil?
   end
@@ -66,6 +76,16 @@ class Job < ActiveRecord::Base
 
     Job.create(
       job_type: :encode,
+      arguments: arguments.to_yaml,
+      priority: Job.new_priority
+    )
+  end
+
+  def self.add_update_output_name(arguments)
+    raise 'video_id is must not be blank' if arguments[:video_id].blank?
+
+    Job.create(
+      job_type: :update_output_name,
       arguments: arguments.to_yaml,
       priority: Job.new_priority
     )
@@ -118,6 +138,11 @@ class Job < ActiveRecord::Base
         log_body = runner.log
       when :destroy_ts
         runner = Lotus::DestroyTS.new(video)
+        result = runner.execute!
+        status = result ? :success : :failure
+        log_body = runner.log
+      when :update_output_name
+        runner = Lotus::UpdateOutputName.new(video)
         result = runner.execute!
         status = result ? :success : :failure
         log_body = runner.log
