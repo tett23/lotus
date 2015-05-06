@@ -6,4 +6,5 @@ gem 'activesupport'
 gem 'activerecord'
 gem 'mysql2'
 gem 'moji'
-gem 'eventmachine'
+gem 'eventmachine', github: 'eventmachine/eventmachine', branch: :master
+gem 'faraday'

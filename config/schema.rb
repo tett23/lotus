@@ -9,3 +9,16 @@ ActiveRecord::Schema.define(version: 0) do
     t.datetime :created_at
   end
 end
+
+ActiveRecord::Schema.define(version: 1) do
+  create_table :programs do |t|
+    t.integer :count
+    t.string :title
+    t.string :episode_name
+    t.string :channel_name
+    t.integer :channel_id
+    t.datetime :start_at
+    t.datetime :end_at
+    t.datetime :last_updated_at
+  end
+end

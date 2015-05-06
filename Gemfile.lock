@@ -1,3 +1,10 @@
+GIT
+  remote: git://github.com/eventmachine/eventmachine.git
+  revision: 6dbdb97bada05d33a1f0d469a49d8c46ac2e77d0
+  branch: master
+  specs:
+    eventmachine (1.0.7)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -17,11 +24,13 @@ GEM
     arel (5.0.0)
     builder (3.2.2)
     chronic (0.10.2)
-    eventmachine (1.0.3)
+    faraday (0.9.1)
+      multipart-post (>= 1.2, < 3)
     i18n (0.6.9)
     json (1.8.1)
     minitest (5.3.2)
     moji (1.6)
+    multipart-post (2.0.0)
     mysql2 (0.3.15)
     thor (0.19.1)
     thread_safe (0.3.3)
@@ -37,7 +46,8 @@ PLATFORMS
 DEPENDENCIES
   activerecord
   activesupport
-  eventmachine
+  eventmachine!
+  faraday
   moji
   mysql2
   thor
