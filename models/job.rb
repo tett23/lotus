@@ -19,7 +19,7 @@ class Job < ActiveRecord::Base
     last_item = self.all().order(priority: :desc, id: :desc).first
 
     if last_item.nil?
-      0
+      1
     else
       last_item.priority + 1
     end
@@ -60,7 +60,7 @@ class Job < ActiveRecord::Base
 
   def self.add_encode(arguments)
     arguments = {
-      encode_size: ENCODE_SIZE[1]
+      encode_size: ENCODE_SIZE[0]
     }.merge(arguments)
     raise 'video_id is must not be blank' if arguments[:video_id].blank?
 
