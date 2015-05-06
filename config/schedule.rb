@@ -29,3 +29,7 @@ end
 every 1.day, at: '6am' do
   lotus "load_ts"
 end
+
+every 1.day, at: '5am' do
+  lotus "get_program"
+end
