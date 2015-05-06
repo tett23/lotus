@@ -14,12 +14,14 @@ module Lotus
 
       JSON.parse(response.body)['items'].each do |item|
         episode_name = item['SubTitle'].nil? ? nil : item['SubTitle'].first(255)
+        count = item['Count'].to_i == 0 ? nil : item['Count']
+
         program = Program.where({
           start_at: Time.at(item['StTime'].to_i),
           end_at: Time.at(item['EdTime'].to_i),
           title: item['Title'],
           episode_name: episode_name,
-          count: item['Count'].to_i,
+          count: count,
           channel_name: item['ChName'],
           channel_id: item['ChID'].to_i,
         }).first_or_create()
@@ -36,7 +38,7 @@ module Lotus
     def query(start_on: nil, end_on: nil)
       {
         start: (start_on || Time.now.beginning_of_day-2.day).strftime('%Y%m%d%H%M'),
-        end: (end_on || Time.now.beginning_of_day+6.day).strftime('%Y%m%d%H%M'),
+        end: (end_on || Time.now.beginning_of_day+0.day).strftime('%Y%m%d%H%M'),
         count: 1000,
         titlefmt: '$(Title),$(Count),$(SubTitleA),$(PID),$(ChName)',
         alt: 'json'
