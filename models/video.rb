@@ -26,7 +26,7 @@ class Video < ActiveRecord::Base
   end
 
   def build_output_name
-    "#{self.name}#{self.episode_number ? '#'+self.episode_number.to_s : ''}#{self.episode_name ? "「#{self.episode_name}」" : ''}_#{self.event_id}.mp4"
+    "#{self.name}#{self.episode_number ? '#'+self.episode_number.to_s : ''}#{self.episode_name ? "「#{Video.truncate(Video.escape(self.episode_name))}」" : ''}_#{self.event_id}.mp4"
   end
 
   def move_output_file(destination)
@@ -42,8 +42,26 @@ class Video < ActiveRecord::Base
     self.save()
   end
 
+  def self.truncate(str, length=90)
+    return str[0..(length-3)] + '...' if(str.size > length)
+
+    str
+  end
+
+  def self.escape(str)
+    str.gsub('^', '')
+      .gsub('!', '！')
+      .gsub('?', '？')
+      .gsub('/', '／')
+      .gsub('*', '＊')
+      .gsub('#', '＃')
+      .gsub(';', '；')
+      .gsub(':', '：')
+  end
+
   private
   def out_video_info_path
     "tmp/video_info_#{self.identification_code}"
   end
+
 end
